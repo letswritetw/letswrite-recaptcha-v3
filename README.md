@@ -1,4 +1,4 @@
-# 用 reCAPTCHA v2 來做非機器人驗證
+# 用 reCAPTCHA v3 來做非機器人驗證
 
 Demo：[demo](https://letswritetw.github.io/letswrite-recaptcha-v3/)
 
