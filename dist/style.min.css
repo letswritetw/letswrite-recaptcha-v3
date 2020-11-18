@@ -1,0 +1,1 @@
+:root{--links: #00A7E5;--hover: #008BBF}*,*::before,*::after{box-sizing:border-box}a:hover,a.active{color:var(--hover)}a.active{font-weight:bold}.none{display:none !important}.text-center{text-align:center}.tab a{display:inline-block;margin-right:1rem;margin-left:1rem}button{background-color:var(--links);color:#fff}button:hover{background-color:var(--hover)}

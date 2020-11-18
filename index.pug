@@ -1,0 +1,172 @@
+- var link = 'recaptcha-v3'
+- var title = '用 reCAPTCHA v3 來做非機器人驗證'
+- var description = '方法1：直接埋 HTML code'
+
+<!DOCTYPE html>
+html(lang="zh-TW")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    meta(http-equiv="X-UA-Compatible", content="ie=edge")
+    title #{title} - Augustus - Let's Write
+
+    link(rel="canonical", href=`https://letswrite.tw/${link}/`)
+    meta(property="og:url", content=`https://letswritetw.github.io/letswrite-${link}/`)
+
+    meta(property="fb:app_id", content="2435108729902508")
+    meta(property="og:type", content="website")
+
+    meta(property="og:site_name", content="Let's Write")
+    meta(property="og:title", content=`${title} - Augustus - Let's Write`)
+    meta(itemprop="name", content=`${title} - Augustus - Let's Write`)
+
+    meta(name="description", content=description)
+    meta(property="og:description", content=description)
+    meta(itemprop="description", content=description)
+
+    meta(itemprop="image", content=`https://letswritetw.github.io/${link}/fb.jpg`)
+    meta(property="og:image", content=`https://letswritetw.github.io/${link}/fb.jpg`)
+    meta(property="og:image:width", content="1200")
+    meta(property="og:image:height", content="630")
+    meta(property="og:image:alt", content=title)
+
+    link(rel="shortcut icon", href="https://letswritetw.github.io/letswritetw/dist/img/logo_512.png")
+
+    //- css
+    link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.css")
+    link(rel="stylesheet", href="dist/style.min.css")
+
+    // Google Tag Manager
+    script.
+      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-PGQ9WQT');
+  body
+
+    // Google Tag Manager (noscript)
+    noscript
+      iframe(src="https://www.googletagmanager.com/ns.html?id=GTM-PGQ9WQT", height="0", width="0", style="display:none;visibility:hidden")
+    
+    #app.container
+
+      h1.text-center reCAPTCHA v3 使用範例
+
+      hr
+
+      .tab.text-center
+        a.active(href="index.html") 方法一
+        a(href="index2.html") 方法二
+        a(href="gas.html") 後端 GAS
+        a(href="https://letswrite.tw/recaptcha-v3/", target="_blank") 筆記文
+
+      hr
+
+      h2 方法1：直接埋 HTML code
+      p 參考文件：
+        a(href="https://developers.google.com/recaptcha/docs/v3#automatically_bind_the_challenge_to_a_button", target="_blank", rel="noopener noreferrer") Automatically bind the challenge to a button
+
+      h3 code
+      pre
+        code.
+          &lt;!-- 在要驗證的地方，放入 reCAPTCHA 的 data -->
+          &lt;button
+              class="g-recaptcha"
+              data-sitekey="網站金鑰"
+              data-action="verify1"
+              data-callback="verifyCallback">送出&lt;/button>
+
+          &lt;-- 引用 JS -->
+          &lt;script src="https://www.google.com/recaptcha/api.js" async defer>&lt;/script>
+
+      ul
+        li
+          strong class 
+          | 必須為「g-recaptcha」
+        li
+          strong data-sitekey
+          | ，填入「網站金鑰」
+        li
+          strong data-action
+          | ，v3 新增的，這邊填的值會顯示在後台報表中
+        li
+          strong data-callback
+          | ，驗證完成後要觸發哪個 function，會回傳 g-recaptcha-response token
+
+      h3 點擊下方的「送出」按鈕來測試
+
+      form
+        label 隨便填個東西
+        input(type="text", placeholder="好啦不填也可以")
+        button(type="button",
+              class="g-recaptcha",
+              data-sitekey="6LcqB-IZAAAAAAQKwKtd2JdlGeCaHRXJL-SWtZlu",
+              data-action="verify",
+              data-callback="verifyCallback") 送出
+
+      
+      h4 驗證成功才會出現的按鈕
+      summary.text-center
+        button#verify-true.none(type="button") 驗證成功！
+        button#verify-false.none(type="button") 我懷疑你是機器人！
+
+      hr
+
+
+
+    script(src="https://www.google.com/recaptcha/api.js", async, defer)
+    script.
+
+      var uriIP = 'https://www.cloudflare.com/cdn-cgi/trace';
+
+      // GAS 部署為網路應用程式後取得的 URL
+      var uriGAS = 'https://script.google.com/macros/s/AKfycbzd4WBgLZ5p73S5kpzWdv5o5gjdlE6ZWlMiZHxu/exec';
+
+      // 取 ip
+      var ip;
+      fetch(uriIP)
+        .then(response => response.text())
+        .then(result => {
+          var resultArr = result.split('\n');
+          for(var i = 0, len = resultArr.length; i < len; i++)	{
+            var tempArr = resultArr[i].split('=');
+            if(tempArr[0] == 'ip') {
+              ip = tempArr[1];
+              break;
+            }
+          }
+        })
+        .catch(err => {
+          window.alert(err)
+        });
+
+      // 方法 1：reCAPTCHA 送到後端做驗證
+      function verifyCallback(token) {
+
+        var formData = new FormData();
+        formData.append('token', token);
+        formData.append('ip', ip);
+
+        fetch(uriGAS, {
+          method: "POST",
+          body: formData
+        }).then(response => response.json())
+          .then(result => {
+            if(result.success) {
+              // 分數大過 0.5，才當作是真實人類操作
+              if(result.score > 0.5) {
+                document.getElementById('verify-true').classList.remove('none');
+              }
+              // 分數低於 0.5，當作機器人
+              else {
+                document.getElementById('verify-false').classList.remove('none');
+              }
+            } else {
+              window.alert(result['error-codes'][0])
+            }
+          })
+          .catch(err => {
+            window.alert(err)
+          })
+      }

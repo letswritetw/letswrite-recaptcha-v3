@@ -1,0 +1,109 @@
+- var link = 'recaptcha-v3'
+- var title = '用 reCAPTCHA v3 來做非機器人驗證'
+- var description = 'Google Apps Script 的程式碼'
+
+<!DOCTYPE html>
+html(lang="zh-TW")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    meta(http-equiv="X-UA-Compatible", content="ie=edge")
+    title #{title} - Augustus - Let's Write
+
+    link(rel="canonical", href=`https://letswrite.tw/${link}/`)
+    meta(property="og:url", content=`https://letswritetw.github.io/letswrite-${link}/`)
+
+    meta(property="fb:app_id", content="2435108729902508")
+    meta(property="og:type", content="website")
+
+    meta(property="og:site_name", content="Let's Write")
+    meta(property="og:title", content=`${title} - Augustus - Let's Write`)
+    meta(itemprop="name", content=`${title} - Augustus - Let's Write`)
+
+    meta(name="description", content=description)
+    meta(property="og:description", content=description)
+    meta(itemprop="description", content=description)
+
+    meta(itemprop="image", content=`https://letswritetw.github.io/${link}/fb.jpg`)
+    meta(property="og:image", content=`https://letswritetw.github.io/${link}/fb.jpg`)
+    meta(property="og:image:width", content="1200")
+    meta(property="og:image:height", content="630")
+    meta(property="og:image:alt", content=title)
+
+    link(rel="shortcut icon", href="https://letswritetw.github.io/letswritetw/dist/img/logo_512.png")
+
+    //- css
+    link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.css")
+    link(rel="stylesheet", href="dist/style.min.css")
+
+    // Google Tag Manager
+    script.
+      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-PGQ9WQT');
+  body
+
+    // Google Tag Manager (noscript)
+    noscript
+      iframe(src="https://www.googletagmanager.com/ns.html?id=GTM-PGQ9WQT", height="0", width="0", style="display:none;visibility:hidden")
+    
+    #app.container
+
+      h1.text-center reCAPTCHA v3 使用範例
+
+      hr
+
+      .tab.text-center
+        a(href="index.html") 方法一
+        a(href="index2.html") 方法二
+        a.active(href="gas.html") 後端 GAS
+        a(href="https://letswrite.tw/recaptcha-v3/", target="_blank") 筆記文
+
+      hr
+
+      h2 Google Apps Script 的程式碼
+      p 參考文件：
+        a(href="https://developers.google.com/recaptcha/docs/verify", target="_blank", rel="noopener noreferrer") Verifying the user's response
+
+      h3 code
+      pre
+        code.
+          function doPost(e) {
+  
+            var params = e.parameter;
+            var token = params.token; // 從前端傳來的 token
+            var ip = params.ip; // 從前端傳來的 IP
+            
+            var uri = 'https://www.google.com/recaptcha/api/siteverify';
+            var data = {
+              secret: 'reCAPTCHA 後台取得的「密鑰」',
+              response: token, 
+              remoteip: ip
+            }
+            
+            var option = {
+              method: 'post',
+              payload: data
+            };
+            
+            var response = UrlFetchApp.fetch(uri, option);
+            return ContentService.createTextOutput(response).setMimeType(ContentService.MimeType.JSON);
+            
+          }
+      
+      p remoteip 為選填。
+      p 程式碼寫完後要「發佈 > 部署為網路應用程式」，並把取得的 URL 給前端 POST。
+
+      h3 回傳的會是 JSON，範例
+      pre
+        code.
+          {
+            "success": true|false,
+            "score": number, // 0.0 - 1.0。0 代表是機器人、1 代表是人類
+            "action": string, // 可以比對跟我們送出去的 action 相不相同
+            "challenge_ts": yyyy-MM-dd'T'HH:mm:ssZZ, 
+            "hostname": string,
+            "error-codes": [...] // optional
+          }
